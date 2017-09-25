@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use LWP::UserAgent;
+
+my $domain = $ARGV[0];
+if (!defined $domain) {
+	print "Usage: $0 <domain.hr>\n";
+	exit 1;
+}
+
+if ($domain =~ /^([a-z0-9\-]{1,64}\.hr)$/i) {
+	$domain = $1;
+} else {
+	print "Domain '$domain' does not look like .hr domain\n";
+	exit 2;
+}
+
+my $req_url = 'https://dns.hr/portal/webwhois?domain=' . lc($domain);
+
+
+my $ua = LWP::UserAgent->new;
+my $req = HTTP::Request->new(GET => $req_url);
+my $html = $ua->request($req)->as_string;
+
+print "html=$html\n";
+
