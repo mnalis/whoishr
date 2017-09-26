@@ -33,19 +33,31 @@ my $tree= HTML::TreeBuilder::XPath->new;
 $tree->parse_content($content);
 
 my @IDs = qw (
-whois-owner-name
-whois-owner-address
-whois-owner-email
-whois-admin-name
-whois-admin-email
-whois-tech-name
-whois-tech-email
-whois-records
-whois-registrar
-whois-expire
+owner-name
+owner-address
+owner-email
+admin-name
+admin-email
+tech-name
+tech-email
+records
+registrar
+expire
 );
 
+# trims all whitespace from beginning and end of string
+sub alltrim($) {
+	my ($s) = @_;
+	$s =~ s/^\s*//;
+	$s =~ s/\s*$//;
+	return $s;
+}
+
+sub getid($) {
+	my ($id) = @_;
+	return alltrim($tree->findvalue( '//*[@id="whois-' . $id . '"]'));
+}
 
 foreach my $id (@IDs) {
-	print "ID($id)=" .  $tree->findvalue( '//*[@id="' . $id . '"]') . "\n";
+	print "$id:\t" . getid($id)  . "\n";
 }
