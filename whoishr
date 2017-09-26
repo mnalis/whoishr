@@ -64,8 +64,10 @@ sub print_id {
 print "HTML-source:\t$req_url\n";
 print "domain-name:\t$domain\n";
 print_id('owner-name', 'owner-address', 'owner-email');
-print "admin-contact:\t" . get_id('whois-admin-name') . ' <' . get_id('whois-admin-email') . ">\n";
-print "tech-contact:\t" .  get_id('whois-tech-name')  . ' <' . get_id('whois-tech-email')  . ">\n";
+my $admin_contact = get_id('whois-admin-name') . ' <' . get_id('whois-admin-email') . ">";
+print "admin-contact:\t$admin_contact\n" if $admin_contact ne ' <>';
+my $tech_contact = get_id('whois-tech-name') . ' <' . get_id('whois-tech-email') . ">";
+print "tech-contact:\t$tech_contact\n" if $tech_contact ne ' <>';
 
 my $XPATH_SKIP_DESC='/p[not(substring-before(., ":"))]';
 
