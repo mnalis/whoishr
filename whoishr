@@ -1,4 +1,6 @@
 #!/usr/bin/perl
+# by Matija Nalis <mnalis-perl@voyager.hr> GPLv3+ started 2017-09-26
+# parses .hr domain registry by scraping web, as it contains more info then WHOIS client
 
 use warnings;
 use strict;
