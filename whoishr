@@ -15,35 +15,24 @@ if (!defined $domain) {
 }
 
 if ($domain =~ /^([a-z0-9\-]{1,64}\.hr)$/i) {
-	$domain = $1;
+	$domain = lc($1);
 } else {
-	print "Domain '$domain' does not look like .hr domain\n";
-	exit 2;
+	print "WARNING: Domain '$domain' does not look like .hr domain, calling regular whois...\n\n";
+	exec "whois", $domain;
+	die "whois(1) does not seem to be installed, aborting";
 }
 
-my $req_url = 'https://dns.hr/portal/webwhois?domain=' . lc($domain);
+my $req_url = 'https://dns.hr/portal/webwhois?domain=' . $domain;
 
 
+# fetch HTML
 my $ua = LWP::UserAgent->new;
 my $req = HTTP::Request->new(GET => $req_url);
 my $content = $ua->request($req)->as_string;
 
-
+# parse HTML
 my $tree= HTML::TreeBuilder::XPath->new;
 $tree->parse_content($content);
-
-my @IDs = qw (
-owner-name
-owner-address
-owner-email
-admin-name
-admin-email
-tech-name
-tech-email
-records
-registrar
-expire
-);
 
 # trims all whitespace from beginning and end of string
 sub alltrim($) {
@@ -53,11 +42,35 @@ sub alltrim($) {
 	return $s;
 }
 
-sub getid($) {
-	my ($id) = @_;
-	return alltrim($tree->findvalue( '//*[@id="whois-' . $id . '"]'));
+# fetch one whois-xxxx id from HTML
+sub get_id {
+	my ($id, $extra_xpath) = @_;
+	$extra_xpath = '' if !defined $extra_xpath;
+	if (wantarray) {
+		return $tree->findnodes_as_strings (qq !//*[\@id="$id"]$extra_xpath!);
+	} else {
+		return alltrim($tree->findvalue (qq !//*[\@id="$id"]$extra_xpath!));
+	}
 }
 
-foreach my $id (@IDs) {
-	print "$id:\t" . getid($id)  . "\n";
+# print one (or more) values from HTML for specified IDs
+sub print_id {
+	my (@IDs) = @_;
+	foreach my $id (@IDs) {
+		print "$id:\t" . get_id("whois-$id")  . "\n";
+	}
 }
+
+print "HTML-source:\t$req_url\n";
+print "domain-name:\t$domain\n";
+print_id('owner-name', 'owner-address', 'owner-email');
+print "admin-contact:\t" . get_id('whois-admin-name') . ' <' . get_id('whois-admin-email') . ">\n";
+print "tech-contact:\t" .  get_id('whois-tech-name')  . ' <' . get_id('whois-tech-email')  . ">\n";
+
+print "domain-expire:\t" . get_id('whois-expire',    '/p[not(substring-before(., ":"))]') . "\n";
+print "registrar:\t" .     get_id('whois-registrar', '/p[not(substring-before(., ":"))]') . "\n";
+
+# FIXME they're just separated by <br />, how to parse?
+#my @ns_records = get_id('whois-records', '/p/br');
+#print "NS: " . join (', ', @ns_records) . "\n";
+
