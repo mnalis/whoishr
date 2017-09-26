@@ -67,10 +67,12 @@ print_id('owner-name', 'owner-address', 'owner-email');
 print "admin-contact:\t" . get_id('whois-admin-name') . ' <' . get_id('whois-admin-email') . ">\n";
 print "tech-contact:\t" .  get_id('whois-tech-name')  . ' <' . get_id('whois-tech-email')  . ">\n";
 
-print "domain-expire:\t" . get_id('whois-expire',    '/p[not(substring-before(., ":"))]') . "\n";
-print "registrar:\t" .     get_id('whois-registrar', '/p[not(substring-before(., ":"))]') . "\n";
+my $XPATH_SKIP_DESC='/p[not(substring-before(., ":"))]';
 
-# FIXME they're just separated by <br />, how to parse?
-#my @ns_records = get_id('whois-records', '/p/br');
-#print "NS: " . join (', ', @ns_records) . "\n";
+print "domain-expire:\t" . get_id('whois-expire',    $XPATH_SKIP_DESC) . "\n";
+print "registrar:\t" .     get_id('whois-registrar', $XPATH_SKIP_DESC) . "\n";
 
+my @ns_records = get_id('whois-records', "${XPATH_SKIP_DESC}/text()");
+foreach my $ns (@ns_records) {
+	print "name-server:\t" . $ns . "\n";
+}
