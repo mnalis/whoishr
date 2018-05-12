@@ -14,7 +14,7 @@ if (!defined $domain) {
 	exit 1;
 }
 
-if ($domain =~ /^([a-z0-9\-]{1,64}\.hr)$/i) {
+if ($domain =~ /^([a-z0-9\-]{1,64}\.(com\.|iz\.|from\.|name\.|)?hr)$/i) {
 	$domain = lc($1);
 } else {
 	print "WARNING: Domain '$domain' does not look like .hr domain, calling regular whois...\n\n" if $0 =~ /whoishr$/;
