@@ -22,7 +22,7 @@ if ($domain =~ /^([a-z0-9\-]{1,64}\.(com\.|iz\.|from\.|name\.|)?hr)$/i) {
 	die "whois(1) does not seem to be installed, aborting";
 }
 
-my $req_url = 'https://dns.hr/portal/webwhois?domain=' . $domain;
+my $req_url = 'https://domene.hr/portal/webwhois?domain=' . $domain;
 
 
 # fetch HTML
