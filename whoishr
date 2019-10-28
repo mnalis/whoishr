@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -T
 # by Matija Nalis <mnalis-perl@voyager.hr> GPLv3+ started 2017-09-26
 # parses .hr domain registry by scraping web, as it contains more info then WHOIS client
 
@@ -8,6 +8,7 @@ use strict;
 use LWP::UserAgent;
 use HTML::TreeBuilder::XPath;
 
+my $DEBUG = $ENV{DEBUG} || 0;
 my $domain = $ARGV[0];
 if (!defined $domain) {
 	print "Usage: $0 <domain.hr>\n";
@@ -28,7 +29,15 @@ my $req_url = 'https://domene.hr/portal/webwhois?domain=' . $domain;
 # fetch HTML
 my $ua = LWP::UserAgent->new;
 my $req = HTTP::Request->new(GET => $req_url);
-my $content = $ua->request($req)->as_string;
+my $response = $ua->request($req);
+my $content = $response->as_string;
+
+$DEBUG > 8 && print "RESPONSE content: $content\n\n";
+
+#use Data::Dumper; print Dumper($response);
+if (! $response->is_success) {
+	die "Connection error: " . $response->status_line;
+}
 
 # parse HTML
 my $tree= HTML::TreeBuilder::XPath->new;
