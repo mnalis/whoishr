@@ -24,11 +24,14 @@ if ($domain =~ /^([a-z0-9\-]{1,64}\.(com\.|iz\.|from\.|name\.|)?hr)$/i) {
 }
 
 my $req_url = 'https://domene.hr/portal/webwhois?domain=' . $domain;
+my $req_referer =  'https://domene.hr/portal/home';
 
 
 # fetch HTML
 my $ua = LWP::UserAgent->new;
+$ua->ssl_opts(SSL_cipher_list => 'DEFAULT:@SECLEVEL=1');
 my $req = HTTP::Request->new(GET => $req_url);
+$req->header("Referer" => $req_referer);
 my $response = $ua->request($req);
 my $content = $response->as_string;
 
