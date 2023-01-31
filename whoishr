@@ -9,13 +9,16 @@ use LWP::UserAgent;
 use HTML::TreeBuilder::XPath;
 
 my $DEBUG = $ENV{DEBUG} || 0;
+
+%ENV = ( PATH => '/usr/local/bin:/usr/bin:/bin' );
+
 my $domain = $ARGV[0];
 if (!defined $domain) {
 	print "Usage: $0 <domain.hr>\n";
 	exit 1;
 }
 
-if ($domain =~ /^([a-z0-9\-]{1,64}\.(com\.|iz\.|from\.|name\.|)?hr)$/i) {
+if ($domain =~ /^(?:www\.)?([a-z0-9\-]{1,64}\.(com\.|iz\.|from\.|name\.|)?hr)$/i) {
 	$domain = lc($1);
 } else {
 	print "WARNING: Domain '$domain' does not look like .hr domain, calling regular whois...\n\n" if $0 =~ /whoishr$/;
