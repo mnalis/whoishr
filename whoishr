@@ -22,6 +22,7 @@ if ($domain =~ /^(?:www\.)?([a-z0-9\-]{1,64}\.(com\.|iz\.|from\.|name\.|)?hr)$/i
 	$domain = lc($1);
 } else {
 	print "WARNING: Domain '$domain' does not look like .hr domain, calling regular whois...\n\n" if $0 =~ /whoishr$/;
+	if ($domain =~ /^([a-z0-9\.\-]+)$/ ) { $domain = $1 } else { die "invalid characters in $domain" }
 	exec "/usr/bin/whois", $domain;
 	die "whois(1) does not seem to be installed, aborting";
 }
